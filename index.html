@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Card — Stage 1b</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens ────────────────────────────────────────────────────── */
+    :root {
+      --bg:           #f5f0e8;
+      --bg-2:         #ede8dc;
+      --surface:      #faf7f2;
+      --surface-2:    #f0ebe0;
+      --border:       #ddd6c8;
+      --border-dark:  #c8bfae;
+      --text-primary: #1a1814;
+      --text-secondary:#5a5346;
+      --text-muted:   #9a9082;
+      --accent:       #c0392b;
+      --accent-dim:   rgba(192,57,43,0.1);
+      --accent-2:     #2c7873;
+      --accent-2-dim: rgba(44,120,115,0.1);
+      --gold:         #b8952a;
+      --gold-dim:     rgba(184,149,42,0.12);
+      --shadow-sm:    0 1px 4px rgba(26,24,20,0.08);
+      --shadow-md:    0 4px 16px rgba(26,24,20,0.1), 0 1px 4px rgba(26,24,20,0.06);
+      --shadow-lg:    0 12px 40px rgba(26,24,20,0.14), 0 2px 8px rgba(26,24,20,0.08);
+      --radius-sm:    6px;
+      --radius-md:    12px;
+      --radius-lg:    20px;
+      --radius-xl:    28px;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Lato', sans-serif;
+      --font-mono:    'Fira Mono', monospace;
+      --t:            0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── Base ──────────────────────────────────────────────────────── */
+    html { font-size: 16px; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      /* warm halftone dot texture */
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* ── Page header ───────────────────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .page-header .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1.15;
+    }
+    .page-header h1 em { font-style: italic; color: var(--text-secondary); }
+
+    /* ── Profile Card ──────────────────────────────────────────────── */
+    article[data-testid="test-profile-card"] {
+      width: 100%;
+      max-width: 680px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: fadeUp 0.55s 0.08s ease both;
+      position: relative;
+    }
+
+    /* top decorative rule */
+    .card-top-rule {
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--accent) 0px,
+        var(--accent) 12px,
+        var(--gold) 12px,
+        var(--gold) 24px,
+        var(--accent-2) 24px,
+        var(--accent-2) 36px,
+        transparent 36px,
+        transparent 40px
+      );
+    }
+
+    /* ── Card hero (avatar + name area) ───────────────────────────── */
+    .card-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 28px 0;
+    }
+
+    /* ── Avatar ────────────────────────────────────────────────────── */
+    figure.avatar-figure {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar-ring {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--gold), var(--accent-2));
+      box-shadow: var(--shadow-md);
+      flex-shrink: 0;
+    }
+
+    img[data-testid="test-user-avatar"] {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--bg-2);
+      border: 3px solid var(--surface);
+    }
+
+    figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ── Name + bio area ───────────────────────────────────────────── */
+    .card-identity {
+      flex: 1;
+      min-width: 0;
+      padding-top: 4px;
+    }
+
+    .card-identity header {
+      margin-bottom: 10px;
+    }
+
+    [data-testid="test-user-name"] {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+      font-weight: 600;
+      line-height: 1.15;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .name-title {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-top: 3px;
+    }
+
+    [data-testid="test-user-bio"] {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      word-break: break-word;
+    }
+
+    /* ── Divider ────────────────────────────────────────────────────── */
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 22px 28px;
+    }
+
+    /* ── Timestamp ──────────────────────────────────────────────────── */
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 28px;
+      margin-bottom: 20px;
+    }
+    .time-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    [data-testid="test-user-time"] {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent-2);
+      background: var(--accent-2-dim);
+      border: 1px solid rgba(44,120,115,0.2);
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.03em;
+      transition: color var(--t);
+    }
+    .time-pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      animation: pulse 1.5s ease infinite;
+      flex-shrink: 0;
+    }
+
+    /* ── Social links ───────────────────────────────────────────────── */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .social-section {
+      padding: 0 28px;
+      margin-bottom: 22px;
+    }
+
+    nav[data-testid="test-user-social-links"] {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+    }
+
+    nav[data-testid="test-user-social-links"] ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: all var(--t);
+    }
+    .social-link:hover {
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+      color: var(--surface);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .social-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .social-link svg {
+      width: 15px; height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* ── Two-column lists section ───────────────────────────────────── */
+    .lists-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    .list-section {
+      background: var(--surface);
+      padding: 20px 28px 24px;
+    }
+    .list-section:first-child {
+      border-radius: 0;
+    }
+
+    .list-section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .list-section-icon {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .hobbies-icon { background: var(--gold-dim); }
+    .dislikes-icon { background: var(--accent-dim); }
+
+    .list-section-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    ul[data-testid="test-user-hobbies"],
+    ul[data-testid="test-user-dislikes"] {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    ul[data-testid="test-user-hobbies"] li,
+    ul[data-testid="test-user-dislikes"] li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .list-bullet {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .hobbies-bullet { background: var(--gold); }
+    .dislikes-bullet { background: var(--accent); }
+
+    /* ── Card footer ────────────────────────────────────────────────── */
+    .card-footer {
+      padding: 14px 28px;
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-footer-text {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .footer-badge {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(192,57,43,0.2);
+      padding: 2px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Page footer ────────────────────────────────────────────────── */
+    .page-footer {
+      margin-top: 28px;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: fadeUp 0.55s 0.15s ease both;
+    }
+
+    /* ── Animations ─────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.4; transform:scale(0.8); }
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+
+    /* Tablet / desktop — default is already side-by-side */
+    @media (max-width: 560px) {
+      body { padding: 24px 12px; background-size: 18px 18px; }
+
+      .card-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 24px 20px 0;
+      }
+
+      .card-identity { padding-top: 0; }
+
+      .card-divider { margin: 18px 20px; }
+
+      .time-row,
+      .social-section { padding: 0 20px; }
+
+      nav[data-testid="test-user-social-links"] ul { justify-content: center; }
+
+      .lists-grid { grid-template-columns: 1fr; }
+
+      .list-section { padding: 18px 20px 20px; }
+
+      .card-footer { padding: 12px 20px; }
+
+      [data-testid="test-user-name"] { font-size: 1.5rem; }
+    }
+
+    @media (min-width: 561px) and (max-width: 767px) {
+      .lists-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (min-width: 768px) {
+      article[data-testid="test-profile-card"] { max-width: 680px; }
+      .avatar-ring { width: 108px; height: 108px; }
+    }
+
+    @media (min-width: 1024px) {
+      .card-hero { padding: 32px 32px 0; }
+      .card-divider { margin: 24px 32px; }
+      .time-row, .social-section { padding: 0 32px; }
+      .list-section { padding: 22px 32px 26px; }
+      .card-footer { padding: 14px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header" role="banner">
+    <p class="eyebrow">HNG i14 · Stage 1b · Frontend</p>
+    <h1>Profile <em>Card</em></h1>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PROFILE CARD ROOT
+  ══════════════════════════════════════════════════════════════ -->
+  <article
+    data-testid="test-profile-card"
+    aria-label="Profile card for DIVINE CHUKWUDI"
+  >
+
+    <!-- Decorative top rule -->
+    <div class="card-top-rule" aria-hidden="true"></div>
+
+    <!-- ── Hero: avatar + identity ──────────────────────────────── -->
+    <div class="card-hero">
+
+      <!-- Avatar -->
+      <figure class="avatar-figure">
+        <div class="avatar-ring">
+          <img
+            data-testid="test-user-avatar"
+            src="https://api.dicebear.com/9.x/notionists/svg?seed=Divine&backgroundColor=b6e3f4,c0aede,d1d4f9"
+            alt="DIVINE CHUKWUDI — Full-Stack ENGINEER avatar"
+            width="108"
+            height="108"
+          />
+        </div>
+        <figcaption>FULL-STACK ENGINEER</figcaption>
+      </figure>
+
+      <!-- Identity -->
+      <div class="card-identity">
+        <header>
+          <h2 data-testid="test-user-name">DIVINE CHUKWUDI</h2>
+          <p class="name-title">FULL-STACK ENGINEER · HNG i14</p>
+        </header>
+
+        <p data-testid="test-user-bio">
+          Crafting pixel-perfect, accessible interfaces with a passion for
+          performance and design systems. Currently sharpening my skills
+          at HNG i14 and building things that feel as good as they look.
+          Based in Lagos, Nigeria 🇳🇬 — shipping code daily.
+        </p>
+      </div>
+
+    </div>
+    <!-- /card-hero -->
+
+    <div class="card-divider" aria-hidden="true"></div>
+
+    <!-- ── Live timestamp ────────────────────────────────────────── -->
+    <div class="time-row">
+      <span class="time-label" aria-hidden="true">Epoch ms</span>
+      <div
+        data-testid="test-user-time"
+        id="user-time"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-label="Current time in milliseconds"
+        role="timer"
+      >—</div>
+      <div class="time-pulse" aria-hidden="true"></div>
+    </div>
+
+    <!-- ── Social links ──────────────────────────────────────────── -->
+    <div class="social-section">
+      <p class="section-label" aria-hidden="true">Find me online</p>
+      <nav
+        data-testid="test-user-social-links"
+        aria-label="Social media links"
+      >
+        <ul role="list">
+
+          <li>
+            <a
+              data-testid="test-user-social-twitter"
+              href="https://twitter.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="Twitter profile (opens in new tab)"
+            >
+              <!-- X / Twitter icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              Twitter
+            </a>
+          </li>
+
+          <li>
+            <a
+              data-testid="test-user-social-github"
+              href="https://github.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="GitHub profile (opens in new tab)"
+            >
+              <!-- GitHub icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              GitHub
+            </a>
+          </li>
+
+          <li>
+            <a
+              data-testid="test-user-social-linkedin"
+              href="https://linkedin.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="LinkedIn profile (opens in new tab)"
+            >
+              <!-- LinkedIn icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              LinkedIn
+            </a>
+          </li>
+
+          <li>
+            <a
+              data-testid="test-user-social-instagram"
+              href="https://instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="Instagram profile (opens in new tab)"
+            >
+              <!-- Instagram icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+              </svg>
+              Instagram
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+    </div>
+
+    <!-- ── Hobbies + Dislikes grid ───────────────────────────────── -->
+    <div class="lists-grid" role="presentation">
+
+      <!-- Hobbies -->
+      <section class="list-section" aria-labelledby="hobbies-heading">
+        <div class="list-section-head">
+          <div class="list-section-icon hobbies-icon" aria-hidden="true">✦</div>
+          <h3 class="list-section-title" id="hobbies-heading">Hobbies</h3>
+        </div>
+        <ul
+          data-testid="test-user-hobbies"
+          role="list"
+          aria-label="Hobbies list"
+        >
+          <li>
+            <span class="list-bullet hobbies-bullet" aria-hidden="true"></span>
+            Building side projects &amp; open source tools
+          </li>
+          <li>
+            <span class="list-bullet hobbies-bullet" aria-hidden="true"></span>
+            UI design &amp; design systems exploration
+          </li>
+          <li>
+            <span class="list-bullet hobbies-bullet" aria-hidden="true"></span>
+            Playing chess online
+          </li>
+          <li>
+            <span class="list-bullet hobbies-bullet" aria-hidden="true"></span>
+            Reading tech blogs &amp; engineering journals
+          </li>
+          <li>
+            <span class="list-bullet hobbies-bullet" aria-hidden="true"></span>
+            Afrobeats &amp; lo-fi music sessions
+          </li>
+        </ul>
+      </section>
+
+      <!-- Dislikes -->
+      <section class="list-section" aria-labelledby="dislikes-heading">
+        <div class="list-section-head">
+          <div class="list-section-icon dislikes-icon" aria-hidden="true">✕</div>
+          <h3 class="list-section-title" id="dislikes-heading">Dislikes</h3>
+        </div>
+        <ul
+          data-testid="test-user-dislikes"
+          role="list"
+          aria-label="Dislikes list"
+        >
+          <li>
+            <span class="list-bullet dislikes-bullet" aria-hidden="true"></span>
+            Unindented, uncommented code
+          </li>
+          <li>
+            <span class="list-bullet dislikes-bullet" aria-hidden="true"></span>
+            Meetings that could've been emails
+          </li>
+          <li>
+            <span class="list-bullet dislikes-bullet" aria-hidden="true"></span>
+            Inaccessible interfaces &amp; poor contrast
+          </li>
+          <li>
+            <span class="list-bullet dislikes-bullet" aria-hidden="true"></span>
+            Slow feedback loops &amp; blocked PRs
+          </li>
+          <li>
+            <span class="list-bullet dislikes-bullet" aria-hidden="true"></span>
+            Inconsistent component naming
+          </li>
+        </ul>
+      </section>
+
+    </div>
+    <!-- /lists-grid -->
+
+    <!-- ── Card footer ───────────────────────────────────────────── -->
+    <footer class="card-footer">
+      <span class="card-footer-text">HNG Internship i14 · Stage 1b</span>
+      <span class="footer-badge">Frontend Wizard</span>
+    </footer>
+
+  </article>
+  <!-- /article -->
+
+  <p class="page-footer">HNG i14 · Stage 1b · Profile Card</p>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    'use strict';
+
+    const timeEl = document.getElementById('user-time');
+
+    function tick() {
+      const ms = Date.now();
+      timeEl.textContent = ms.toLocaleString('en-US'); // readable with commas
+      timeEl.setAttribute('data-ms', ms); // raw value for test queries
+      timeEl.setAttribute('aria-label', `Current epoch time: ${ms} milliseconds`);
+    }
+
+    // Update every 1000ms — accurate and not spammy for aria-live
+    tick();
+    setInterval(tick, 1000);
+
+  })();
+  </script>
+
+</body>
+</html>
